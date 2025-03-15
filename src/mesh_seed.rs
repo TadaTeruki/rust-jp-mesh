@@ -2,7 +2,7 @@ use crate::geom::{Coordinates, Rect};
 use crate::mesh_type::JPMeshType;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JPMeshCodeSeed {
+pub(crate) struct JPMeshCodeSeed {
     // mesh code for 80km, 10km, 1km, 500m, 250m, 125m
     pub(crate) code_2: [u8; 11],
 }
@@ -87,7 +87,7 @@ impl JPMeshCodeSeed {
         let mut code_2 = self.code_2;
 
         for (i, code) in code_2.iter_mut().enumerate().skip(mesh_type.code_length()) {
-            *code = if i >= mesh_type.code_length() { 1 } else { 0 };
+            *code = if i >= 8 { 1 } else { 0 };
         }
 
         let p = (code_2[0] * 10 + code_2[1]) as f64;

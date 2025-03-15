@@ -32,7 +32,7 @@ impl JPMeshCode {
         }
     }
 
-    pub fn from_inside_bounds(bounds: Rect, mesh_type: JPMeshType) -> Vec<Self> {
+    pub fn from_on_bounds(bounds: Rect, mesh_type: JPMeshType) -> Vec<Self> {
         let mut mesh_codes = vec![];
         let min = bounds.min();
         let max = bounds.max();
