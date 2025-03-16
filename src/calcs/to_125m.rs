@@ -36,10 +36,7 @@ impl CodeTo125m {
         let h = g % JPMeshType::Mesh1km.lng_interval();
 
         if mesh_type == JPMeshType::Mesh1km {
-            return CodeNum::new(
-                [p1, p2, u1, u2, q, v, r, w, 0, 0, 0],
-                mesh_type.code_length(),
-            );
+            return CodeNum::new(&[p1, p2, u1, u2, q, v, r, w]);
         }
 
         // c / lat_interval (Mesh500m) = s % d
@@ -54,10 +51,7 @@ impl CodeTo125m {
         let m = (s * 2) + (x + 1);
 
         if mesh_type == JPMeshType::Mesh500m {
-            return CodeNum::new(
-                [p1, p2, u1, u2, q, v, r, w, m, 0, 0],
-                mesh_type.code_length(),
-            );
+            return CodeNum::new(&[p1, p2, u1, u2, q, v, r, w, m]);
         }
 
         // d / lat_interval (Mesh250m) = t % e
@@ -72,10 +66,7 @@ impl CodeTo125m {
         let n = (t * 2) + (y + 1);
 
         if mesh_type == JPMeshType::Mesh250m {
-            return CodeNum::new(
-                [p1, p2, u1, u2, q, v, r, w, m, n, 0],
-                mesh_type.code_length(),
-            );
+            return CodeNum::new(&[p1, p2, u1, u2, q, v, r, w, m, n]);
         }
 
         // e / lat_interval (Mesh125m) = tt
@@ -87,10 +78,7 @@ impl CodeTo125m {
         // (tt * 2)+(yy + 1)= nn
         let nn = (tt * 2) + (yy + 1);
 
-        CodeNum::new(
-            [p1, p2, u1, u2, q, v, r, w, m, n, nn],
-            mesh_type.code_length(),
-        )
+        CodeNum::new(&[p1, p2, u1, u2, q, v, r, w, m, n, nn])
     }
 
     pub fn to_bounds(self, mesh_type: JPMeshType) -> Rect {

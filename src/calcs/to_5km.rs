@@ -18,7 +18,7 @@ impl CodeTo5km {
         let u2 = u % 10;
 
         if mesh_type == JPMeshType::Mesh80km {
-            return CodeNum::new([p1, p2, u1, u2, 0, 0, 0], mesh_type.code_length());
+            return CodeNum::new(&[p1, p2, u1, u2]);
         }
 
         // a / lat_interval (Mesh10km) = q % b
@@ -30,7 +30,7 @@ impl CodeTo5km {
         let g = f % JPMeshType::Mesh10km.lng_interval();
 
         if mesh_type == JPMeshType::Mesh10km {
-            return CodeNum::new([p1, p2, u1, u2, q, v, 0], mesh_type.code_length());
+            return CodeNum::new(&[p1, p2, u1, u2, q, v]);
         }
 
         // b / lat_interval (Mesh5km) = r % c
@@ -41,7 +41,7 @@ impl CodeTo5km {
 
         let m = (r * 2) + (w + 1);
 
-        CodeNum::new([p1, p2, u1, u2, q, v, m], mesh_type.code_length())
+        CodeNum::new(&[p1, p2, u1, u2, q, v, m])
     }
 
     pub fn to_bounds(self, mesh_type: JPMeshType) -> Rect {

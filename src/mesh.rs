@@ -59,15 +59,15 @@ impl JPMesh {
             | JPMeshType::Mesh500m
             | JPMeshType::Mesh250m
             | JPMeshType::Mesh125m => {
-                let code = CodeTo125m::from_number(mesh, mesh_type.code_length());
+                let code = CodeTo125m::from_number(mesh);
                 JPMesh::To125m { code, mesh_type }
             }
             JPMeshType::Mesh2km => {
-                let code = CodeTo2km::from_number(mesh, mesh_type.code_length());
+                let code = CodeTo2km::from_number(mesh);
                 JPMesh::To2km { code, mesh_type }
             }
             JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
-                let code = CodeTo5km::from_number(mesh, mesh_type.code_length());
+                let code = CodeTo5km::from_number(mesh);
                 JPMesh::To5km { code, mesh_type }
             }
         }

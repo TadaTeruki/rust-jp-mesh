@@ -3,7 +3,7 @@ use crate::{Coordinates, JPMeshType, Rect, code_num::CodeNum};
 pub type CodeTo2km = CodeNum<9, 0>;
 
 impl CodeTo2km {
-    pub fn from_coordinates(coords: Coordinates, mesh_type: JPMeshType) -> Self {
+    pub fn from_coordinates(coords: Coordinates, _mesh_type: JPMeshType) -> Self {
         // latitude / interval (Mesh80km) = p % a
         let p = (coords.lat / JPMeshType::Mesh80km.lat_interval()).floor() as u8;
         let a = coords.lat % JPMeshType::Mesh80km.lat_interval();
@@ -17,10 +17,6 @@ impl CodeTo2km {
         let u1 = (u / 10) % 10;
         let u2 = u % 10;
 
-        if mesh_type == JPMeshType::Mesh80km {
-            return CodeNum::new([p1, p2, u1, u2, 0, 0, 0, 0, 0], mesh_type.code_length());
-        }
-
         // a / lat_interval (Mesh10km) = q % b
         let q = (a / JPMeshType::Mesh10km.lat_interval()).floor() as u8;
         let b = a % JPMeshType::Mesh10km.lat_interval();
@@ -28,10 +24,6 @@ impl CodeTo2km {
         // f / lng_interval (Mesh10km) = v % g
         let v = (f / JPMeshType::Mesh10km.lng_interval()).floor() as u8;
         let g = f % JPMeshType::Mesh10km.lng_interval();
-
-        if mesh_type == JPMeshType::Mesh10km {
-            return CodeNum::new([p1, p2, u1, u2, q, v, 0, 0, 0], mesh_type.code_length());
-        }
 
         // b / lat_interval (Mesh2km) = r
         let r = (b / JPMeshType::Mesh2km.lat_interval()).floor() as u8;
@@ -42,11 +34,7 @@ impl CodeTo2km {
         let r_code = r * 2;
         let w_code = w * 2;
 
-        // 最後に数字の5を加える
-        CodeNum::new(
-            [p1, p2, u1, u2, q, v, r_code, w_code, 5],
-            mesh_type.code_length(),
-        )
+        CodeNum::new(&[p1, p2, u1, u2, q, v, r_code, w_code, 5])
     }
 
     pub fn to_bounds(self, mesh_type: JPMeshType) -> Rect {
