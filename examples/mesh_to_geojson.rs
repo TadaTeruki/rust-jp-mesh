@@ -1,4 +1,4 @@
-use rust_japan_mesh::{Coordinates, JPMeshCode, JPMeshType, Rect};
+use rust_japan_mesh::{Coordinates, JPMesh, JPMeshType, Rect};
 use serde::Serialize;
 use std::fs::File;
 use std::io::Write;
@@ -44,7 +44,7 @@ fn rect_to_polygon(rect: Rect) -> Vec<Vec<Vec<f64>>> {
 }
 
 fn create_geojson_for_mesh_type(bounds: Rect, mesh_type: JPMeshType) -> GeoJsonFeatureCollection {
-    let mesh_codes = JPMeshCode::from_on_bounds(bounds, mesh_type);
+    let mesh_codes = JPMesh::from_on_bounds(bounds, mesh_type);
 
     let features = mesh_codes
         .into_iter()

@@ -7,15 +7,15 @@ use crate::{
 ///
 /// # サンプル
 /// ```
-/// use rust_japan_mesh::{Coordinates, JPMeshCode, JPMeshType};
+/// use rust_japan_mesh::{Coordinates, JPMesh, JPMeshType};
 ///
 /// let coords = Coordinates::new(139.767125, 35.681236);
-/// let mesh_code = JPMeshCode::new(coords, JPMeshType::Mesh500m);
-/// assert_eq!(mesh_code.to_number(), 533946113);
-/// assert!(mesh_code.to_bounds().includes(coords));
+/// let mesh = JPMesh::new(coords, JPMeshType::Mesh500m);
+/// assert_eq!(mesh.to_number(), 533946113);
+/// assert!(mesh.to_bounds().includes(coords));
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum JPMeshCode {
+pub enum JPMesh {
     To125m {
         code: CodeTo125m,
         mesh_type: JPMeshType,
@@ -26,7 +26,7 @@ pub enum JPMeshCode {
     },
 }
 
-impl JPMeshCode {
+impl JPMesh {
     /// 指定された緯度経度から地域メッシュを生成します。
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
         match mesh_type {
@@ -35,28 +35,28 @@ impl JPMeshCode {
             | JPMeshType::Mesh250m
             | JPMeshType::Mesh125m => {
                 let code = CodeTo125m::from_coordinates(coords, mesh_type);
-                JPMeshCode::To125m { code, mesh_type }
+                JPMesh::To125m { code, mesh_type }
             }
             JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
                 let code = CodeTo5km::from_coordinates(coords, mesh_type);
-                JPMeshCode::To5km { code, mesh_type }
+                JPMesh::To5km { code, mesh_type }
             }
         }
     }
 
     /// 指定された地域メッシュコードと種類から地域メッシュを生成します。
-    pub fn from_number(mesh_code: u64, mesh_type: JPMeshType) -> Self {
+    pub fn from_number(mesh: u64, mesh_type: JPMeshType) -> Self {
         match mesh_type {
             JPMeshType::Mesh1km
             | JPMeshType::Mesh500m
             | JPMeshType::Mesh250m
             | JPMeshType::Mesh125m => {
-                let code = CodeTo125m::from_number(mesh_code, mesh_type.code_length());
-                JPMeshCode::To125m { code, mesh_type }
+                let code = CodeTo125m::from_number(mesh, mesh_type.code_length());
+                JPMesh::To125m { code, mesh_type }
             }
             JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
-                let code = CodeTo5km::from_number(mesh_code, mesh_type.code_length());
-                JPMeshCode::To5km { code, mesh_type }
+                let code = CodeTo5km::from_number(mesh, mesh_type.code_length());
+                JPMesh::To5km { code, mesh_type }
             }
         }
     }
@@ -93,7 +93,7 @@ impl JPMeshCode {
         let lat_len = ((max.lat - min.lat) / mesh_type.lat_interval()).ceil() as u64;
         let lng_len = ((max.lng - min.lng) / mesh_type.lng_interval()).ceil() as u64;
 
-        let start = JPMeshCode::new(min, mesh_type).to_bounds().center();
+        let start = JPMesh::new(min, mesh_type).to_bounds().center();
 
         for i in 0..=lat_len {
             for j in 0..=lng_len {
@@ -101,7 +101,7 @@ impl JPMeshCode {
                     start.lng + j as f64 * mesh_type.lng_interval(),
                     start.lat + i as f64 * mesh_type.lat_interval(),
                 );
-                mesh_bins.push(JPMeshCode::new(coords, mesh_type));
+                mesh_bins.push(JPMesh::new(coords, mesh_type));
             }
         }
 
@@ -147,7 +147,7 @@ mod tests {
 
     #[derive(Debug)]
     struct TestCase {
-        mesh_code_number: u64,
+        mesh_number: u64,
         mesh_type: JPMeshType,
         left_bottom: Coordinates,
     }
@@ -164,22 +164,22 @@ mod tests {
     fn get_test_cases() -> Vec<TestCase> {
         return vec![
             TestCase {
-                mesh_code_number: 64414277,
+                mesh_number: 64414277,
                 mesh_type: JPMeshType::Mesh1km,
                 left_bottom: Coordinates::new(141.3375, 43.058333),
             },
             TestCase {
-                mesh_code_number: 61401589,
+                mesh_number: 61401589,
                 mesh_type: JPMeshType::Mesh1km,
                 left_bottom: Coordinates::new(140.7375, 40.816667),
             },
             TestCase {
-                mesh_code_number: 59414142,
+                mesh_number: 59414142,
                 mesh_type: JPMeshType::Mesh1km,
                 left_bottom: Coordinates::new(141.15, 39.7),
             },
             TestCase {
-                mesh_code_number: 57403629,
+                mesh_number: 57403629,
                 mesh_type: JPMeshType::Mesh1km,
                 left_bottom: Coordinates::new(140.8625, 38.266667),
             },
@@ -187,23 +187,23 @@ mod tests {
     }
 
     #[test]
-    fn test_mesh_code_generation() {
+    fn test_mesh_generation() {
         for test_case in get_test_cases() {
             let inner_coord = test_case.inner_coord();
-            let mesh_code = JPMeshCode::new(inner_coord, test_case.mesh_type);
+            let mesh = JPMesh::new(inner_coord, test_case.mesh_type);
 
-            let actual_number = mesh_code.to_number();
-            assert_eq!(actual_number, test_case.mesh_code_number);
+            let actual_number = mesh.to_number();
+            assert_eq!(actual_number, test_case.mesh_number);
         }
     }
 
     #[test]
-    fn test_mesh_code_bounds() {
+    fn test_mesh_bounds() {
         for test_case in get_test_cases() {
             let inner_coord = test_case.inner_coord();
-            let mesh_code = JPMeshCode::new(inner_coord, test_case.mesh_type);
+            let mesh = JPMesh::new(inner_coord, test_case.mesh_type);
 
-            let bounds = mesh_code.to_bounds();
+            let bounds = mesh.to_bounds();
             let min_coord = bounds.min();
 
             // check if the bottom left coordinate is correct
@@ -216,19 +216,18 @@ mod tests {
     }
 
     #[test]
-    fn test_mesh_code_from_number_to_number() {
+    fn test_mesh_from_number_to_number() {
         for test_case in get_test_cases() {
-            let mesh_code =
-                JPMeshCode::from_number(test_case.mesh_code_number, test_case.mesh_type);
-            let number = mesh_code.to_number();
-            assert_eq!(number, test_case.mesh_code_number);
+            let mesh = JPMesh::from_number(test_case.mesh_number, test_case.mesh_type);
+            let number = mesh.to_number();
+            assert_eq!(number, test_case.mesh_number);
         }
     }
 
     #[test]
-    fn test_mesh_code_corner() {
-        let mesh_code = JPMeshCode::new(Coordinates::new(141.15, 39.7), JPMeshType::Mesh1km);
-        let bounds = mesh_code.to_bounds();
+    fn test_mesh_corner() {
+        let mesh = JPMesh::new(Coordinates::new(141.15, 39.7), JPMeshType::Mesh1km);
+        let bounds = mesh.to_bounds();
         let min_coord = bounds.min();
 
         assert_approx_eq!(min_coord.lng, 141.15);
