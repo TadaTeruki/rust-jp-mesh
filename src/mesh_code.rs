@@ -1,30 +1,58 @@
-use crate::{Coordinates, JPMeshType, Rect, calcs::to_125m::CodeTo125m};
+use crate::{
+    Coordinates, JPMeshType, Rect,
+    calcs::{to_5km::CodeTo5km, to_125m::CodeTo125m},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct JPMeshCode {
-    code_to125m: CodeTo125m,
-    mesh_type: JPMeshType,
+pub enum JPMeshCode {
+    To125m {
+        code: CodeTo125m,
+        mesh_type: JPMeshType,
+    },
+    To5km {
+        code: CodeTo5km,
+        mesh_type: JPMeshType,
+    },
 }
 
 impl JPMeshCode {
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
-        let code_to125m = CodeTo125m::from_coordinates(coords, mesh_type);
-        Self {
-            code_to125m,
-            mesh_type,
+        match mesh_type {
+            JPMeshType::Mesh1km
+            | JPMeshType::Mesh500m
+            | JPMeshType::Mesh250m
+            | JPMeshType::Mesh125m => {
+                let code = CodeTo125m::from_coordinates(coords, mesh_type);
+                JPMeshCode::To125m { code, mesh_type }
+            }
+            JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
+                let code = CodeTo5km::from_coordinates(coords, mesh_type);
+                JPMeshCode::To5km { code, mesh_type }
+            }
         }
     }
 
     pub fn from_number(mesh_code: u64, mesh_type: JPMeshType) -> Self {
-        let code_to125m = CodeTo125m::from_number(mesh_code, mesh_type);
-        Self {
-            code_to125m,
-            mesh_type,
+        match mesh_type {
+            JPMeshType::Mesh1km
+            | JPMeshType::Mesh500m
+            | JPMeshType::Mesh250m
+            | JPMeshType::Mesh125m => {
+                let code = CodeTo125m::from_number(mesh_code, mesh_type.code_length());
+                JPMeshCode::To125m { code, mesh_type }
+            }
+            JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
+                let code = CodeTo5km::from_number(mesh_code, mesh_type.code_length());
+                JPMeshCode::To5km { code, mesh_type }
+            }
         }
     }
 
     pub fn to_bounds(&self) -> Rect {
-        self.code_to125m.to_bounds(self.mesh_type)
+        match self {
+            Self::To125m { code, mesh_type } => code.to_bounds(*mesh_type),
+            Self::To5km { code, mesh_type } => code.to_bounds(*mesh_type),
+        }
     }
 
     pub fn is_inside(&self, coords: Coordinates) -> bool {
@@ -39,11 +67,17 @@ impl JPMeshCode {
     }
 
     pub fn to_number(self) -> u64 {
-        self.code_to125m.0.to_number(self.mesh_type.code_length())
+        match self {
+            Self::To125m { code, mesh_type } => code.to_number(mesh_type.code_length()),
+            Self::To5km { code, mesh_type } => code.to_number(mesh_type.code_length()),
+        }
     }
 
     pub fn mesh_type(&self) -> JPMeshType {
-        self.mesh_type
+        match self {
+            Self::To125m { mesh_type, .. } => *mesh_type,
+            Self::To5km { mesh_type, .. } => *mesh_type,
+        }
     }
 
     pub fn from_on_bounds(bounds: Rect, mesh_type: JPMeshType) -> Vec<Self> {

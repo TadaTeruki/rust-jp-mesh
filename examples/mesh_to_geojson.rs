@@ -97,6 +97,14 @@ fn main() -> std::io::Result<()> {
             JPMeshType::Mesh10km,
         ),
         (
+            "out/mesh5km.geojson",
+            Rect::new(
+                Coordinates::new(140.5, 41.5),
+                Coordinates::new(141.5, 42.5),
+            ),
+            JPMeshType::Mesh5km,
+        ),
+        (
             "out/mesh1km.geojson",
             Rect::new(
                 Coordinates::new(140.55, 41.60),

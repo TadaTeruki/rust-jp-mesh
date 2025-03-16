@@ -1,23 +1,9 @@
 use crate::{Coordinates, JPMeshType, Rect, code_num::CodeNum};
 
-use super::JPMeshCalcType;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CodeTo125m(pub CodeNum<11, 7>);
+pub type CodeTo125m = CodeNum<11, 7>;
 
 impl CodeTo125m {
-    pub fn from_number(mesh_code: u64, mesh_type: JPMeshType) -> Self {
-        if mesh_type.calc_type() != JPMeshCalcType::To125m {
-            return Self(CodeNum::default());
-        }
-        CodeTo125m(CodeNum::from_number(mesh_code, mesh_type.code_length()))
-    }
-
     pub fn from_coordinates(coords: Coordinates, mesh_type: JPMeshType) -> Self {
-        if mesh_type.calc_type() != JPMeshCalcType::To125m {
-            return Self(CodeNum::default());
-        }
-
         // latitude / interval (Mesh80km) = p % a
         let p = (coords.lat / JPMeshType::Mesh80km.lat_interval()).floor() as u8;
         let a = coords.lat % JPMeshType::Mesh80km.lat_interval();
@@ -30,14 +16,7 @@ impl CodeTo125m {
         let p2 = p % 10;
         let u1 = (u / 10) % 10;
         let u2 = u % 10;
-
-        if mesh_type == JPMeshType::Mesh80km {
-            return Self(CodeNum::new(
-                [p1, p2, u1, u2, 0, 0, 0, 0, 0, 0, 0],
-                mesh_type.code_length(),
-            ));
-        }
-
+        
         // a / lat_interval (Mesh10km) = q % b
         let q = (a / JPMeshType::Mesh10km.lat_interval()).floor() as u8;
         let b = a % JPMeshType::Mesh10km.lat_interval();
@@ -45,13 +24,6 @@ impl CodeTo125m {
         // f / lng_interval (Mesh10km) = v % g
         let v = (f / JPMeshType::Mesh10km.lng_interval()).floor() as u8;
         let g = f % JPMeshType::Mesh10km.lng_interval();
-
-        if mesh_type == JPMeshType::Mesh10km {
-            return CodeTo125m(CodeNum::new(
-                [p1, p2, u1, u2, q, v, 0, 0, 0, 0, 0],
-                mesh_type.code_length(),
-            ));
-        }
 
         // b / lat_interval (Mesh1km) = r % c
         let r = (b / JPMeshType::Mesh1km.lat_interval()).floor() as u8;
@@ -62,10 +34,10 @@ impl CodeTo125m {
         let h = g % JPMeshType::Mesh1km.lng_interval();
 
         if mesh_type == JPMeshType::Mesh1km {
-            return CodeTo125m(CodeNum::new(
+            return CodeNum::new(
                 [p1, p2, u1, u2, q, v, r, w, 0, 0, 0],
                 mesh_type.code_length(),
-            ));
+            );
         }
 
         // c / lat_interval (Mesh500m) = s % d
@@ -80,10 +52,10 @@ impl CodeTo125m {
         let m = (s * 2) + (x + 1);
 
         if mesh_type == JPMeshType::Mesh500m {
-            return CodeTo125m(CodeNum::new(
+            return CodeNum::new(
                 [p1, p2, u1, u2, q, v, r, w, m, 0, 0],
                 mesh_type.code_length(),
-            ));
+            );
         }
 
         // d / lat_interval (Mesh250m) = t % e
@@ -98,10 +70,10 @@ impl CodeTo125m {
         let n = (t * 2) + (y + 1);
 
         if mesh_type == JPMeshType::Mesh250m {
-            return CodeTo125m(CodeNum::new(
+            return CodeNum::new(
                 [p1, p2, u1, u2, q, v, r, w, m, n, 0],
                 mesh_type.code_length(),
-            ));
+            );
         }
 
         // e / lat_interval (Mesh125m) = tt
@@ -113,14 +85,14 @@ impl CodeTo125m {
         // (tt * 2)+(yy + 1)= nn
         let nn = (tt * 2) + (yy + 1);
 
-        CodeTo125m(CodeNum::new(
+        CodeNum::new(
             [p1, p2, u1, u2, q, v, r, w, m, n, nn],
             mesh_type.code_length(),
-        ))
+        )
     }
 
     pub fn to_bounds(self, mesh_type: JPMeshType) -> Rect {
-        let code_array = self.0.to_array();
+        let code_array = self.to_array();
 
         let p = (code_array[0] * 10 + code_array[1]) as f64;
         let u = (code_array[2] * 10 + code_array[3]) as f64;

@@ -1,5 +1,3 @@
-use crate::calcs::JPMeshCalcType;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMeshType {
     /// 第1次地域区画
@@ -14,6 +12,8 @@ pub enum JPMeshType {
     Mesh250m,
     /// 8分の1地域メッシュ
     Mesh125m,
+    /// 5倍地域メッシュ
+    Mesh5km,
 }
 
 impl Ord for JPMeshType {
@@ -37,6 +37,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 9,
             JPMeshType::Mesh250m => 10,
             JPMeshType::Mesh125m => 11,
+            JPMeshType::Mesh5km => 7,
         }
     }
 
@@ -48,6 +49,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 15.0,
             JPMeshType::Mesh250m => 7.5,
             JPMeshType::Mesh125m => 3.75,
+            JPMeshType::Mesh5km => 150.0,
         }
     }
 
@@ -59,6 +61,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 22.5,
             JPMeshType::Mesh250m => 11.25,
             JPMeshType::Mesh125m => 5.625,
+            JPMeshType::Mesh5km => 225.0,
         }
     }
 
@@ -68,17 +71,6 @@ impl JPMeshType {
 
     pub const fn lng_interval(&self) -> f64 {
         self.lng_interval_seconds() / 3600.0
-    }
-
-    pub const fn calc_type(&self) -> JPMeshCalcType {
-        match self {
-            JPMeshType::Mesh80km => JPMeshCalcType::To125m,
-            JPMeshType::Mesh10km => JPMeshCalcType::To125m,
-            JPMeshType::Mesh1km => JPMeshCalcType::To125m,
-            JPMeshType::Mesh500m => JPMeshCalcType::To125m,
-            JPMeshType::Mesh250m => JPMeshCalcType::To125m,
-            JPMeshType::Mesh125m => JPMeshCalcType::To125m,
-        }
     }
 }
 
