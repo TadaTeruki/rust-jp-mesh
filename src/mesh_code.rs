@@ -179,6 +179,17 @@ impl JPMeshCode {
         )
     }
 
+    pub fn is_inside(&self, coords: Coordinates) -> bool {
+        let bounds = self.to_bounds();
+        let min = bounds.min();
+        let max = bounds.max();
+
+        coords.lat >= min.lat
+            && coords.lat < max.lat
+            && coords.lng >= min.lng
+            && coords.lng < max.lng
+    }
+
     pub fn to_number(self) -> u64 {
         self.0.to_number(self.1.code_length())
     }
