@@ -1,7 +1,7 @@
-use crate::{Coordinates, JPMeshType, Rect, code11::Code11};
+use crate::{Coordinates, JPMeshType, Rect, code_num::CodeNum};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct JPMeshCode(Code11<3>, JPMeshType);
+pub struct JPMeshCode(CodeNum<11, 3>, JPMeshType);
 
 impl JPMeshCode {
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
@@ -10,7 +10,7 @@ impl JPMeshCode {
 
     pub fn from_number(mesh_code: u64, mesh_type: JPMeshType) -> Self {
         Self(
-            Code11::from_number(mesh_code, mesh_type.code_length()),
+            CodeNum::from_number(mesh_code, mesh_type.code_length()),
             mesh_type,
         )
     }
@@ -31,7 +31,7 @@ impl JPMeshCode {
 
         if mesh_type == JPMeshType::Mesh80km {
             return Self(
-                Code11::new(
+                CodeNum::new(
                     [p1, p2, u1, u2, 0, 0, 0, 0, 0, 0, 0],
                     mesh_type.code_length(),
                 ),
@@ -49,7 +49,7 @@ impl JPMeshCode {
 
         if mesh_type == JPMeshType::Mesh10km {
             return Self(
-                Code11::new(
+                CodeNum::new(
                     [p1, p2, u1, u2, q, v, 0, 0, 0, 0, 0],
                     mesh_type.code_length(),
                 ),
@@ -67,7 +67,7 @@ impl JPMeshCode {
 
         if mesh_type == JPMeshType::Mesh1km {
             return Self(
-                Code11::new(
+                CodeNum::new(
                     [p1, p2, u1, u2, q, v, r, w, 0, 0, 0],
                     mesh_type.code_length(),
                 ),
@@ -88,7 +88,7 @@ impl JPMeshCode {
 
         if mesh_type == JPMeshType::Mesh500m {
             return Self(
-                Code11::new(
+                CodeNum::new(
                     [p1, p2, u1, u2, q, v, r, w, m, 0, 0],
                     mesh_type.code_length(),
                 ),
@@ -109,7 +109,7 @@ impl JPMeshCode {
 
         if mesh_type == JPMeshType::Mesh250m {
             return Self(
-                Code11::new(
+                CodeNum::new(
                     [p1, p2, u1, u2, q, v, r, w, m, n, 0],
                     mesh_type.code_length(),
                 ),
@@ -127,7 +127,7 @@ impl JPMeshCode {
         let nn = (tt * 2) + (yy + 1);
 
         Self(
-            Code11::new(
+            CodeNum::new(
                 [p1, p2, u1, u2, q, v, r, w, m, n, nn],
                 mesh_type.code_length(),
             ),
