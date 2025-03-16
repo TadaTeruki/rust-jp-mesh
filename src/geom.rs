@@ -31,4 +31,11 @@ impl Rect {
     pub fn max(&self) -> Coordinates {
         self.max_coord
     }
+
+    pub fn center(&self) -> Coordinates {
+        Coordinates::new(
+            (self.min_coord.lng + self.max_coord.lng) / 2.0,
+            (self.min_coord.lat + self.max_coord.lat) / 2.0,
+        )
+    }
 }

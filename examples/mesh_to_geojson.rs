@@ -33,7 +33,7 @@ struct GeoJsonGeometry {
 fn rect_to_polygon(rect: Rect) -> Vec<Vec<Vec<f64>>> {
     let min = rect.min();
     let max = rect.max();
-    
+
     // GeoJSONのポリゴン座標は[経度, 緯度]の順で、反時計回りに定義
     // 最初と最後の座標は同じである必要がある
     vec![vec![
@@ -48,14 +48,14 @@ fn rect_to_polygon(rect: Rect) -> Vec<Vec<Vec<f64>>> {
 fn create_geojson_for_mesh_type(bounds: Rect, mesh_type: JPMeshType) -> GeoJsonFeatureCollection {
     // 指定された範囲内のメッシュコードを取得
     let mesh_codes = JPMeshCode::from_on_bounds(bounds, mesh_type);
-    
+
     // 各メッシュコードをGeoJSONのフィーチャーに変換
     let features = mesh_codes
         .into_iter()
         .map(|mesh_code| {
             let bounds = mesh_code.to_bounds();
             let mesh_code_number = mesh_code.to_number();
-            
+
             GeoJsonFeature {
                 feature_type: "Feature".to_string(),
                 properties: GeoJsonProperties {
@@ -68,7 +68,7 @@ fn create_geojson_for_mesh_type(bounds: Rect, mesh_type: JPMeshType) -> GeoJsonF
             }
         })
         .collect();
-    
+
     GeoJsonFeatureCollection {
         feature_type: "FeatureCollection".to_string(),
         features,
@@ -88,18 +88,12 @@ fn main() -> std::io::Result<()> {
     let mesh_configs = vec![
         (
             "out/mesh80km.geojson",
-            Rect::new(
-                Coordinates::new(138.0, 39.0),
-                Coordinates::new(144.0, 45.0),
-            ),
+            Rect::new(Coordinates::new(138.0, 39.0), Coordinates::new(144.0, 45.0)),
             JPMeshType::Mesh80km,
         ),
         (
             "out/mesh10km.geojson",
-            Rect::new(
-                Coordinates::new(140.0, 41.0),
-                Coordinates::new(142.0, 43.0),
-            ),
+            Rect::new(Coordinates::new(140.0, 41.0), Coordinates::new(142.0, 43.0)),
             JPMeshType::Mesh10km,
         ),
         (

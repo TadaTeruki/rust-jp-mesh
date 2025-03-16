@@ -205,11 +205,15 @@ impl JPMeshCode {
         let lat_len = ((max.lat - min.lat) / mesh_type.lat_interval()).ceil() as u64;
         let lng_len = ((max.lng - min.lng) / mesh_type.lng_interval()).ceil() as u64;
 
+        let start_coords = JPMeshCode::from_coordinates(min, mesh_type)
+            .to_bounds()
+            .center();
+
         for i in 0..=lat_len {
             for j in 0..=lng_len {
                 let coords = Coordinates::new(
-                    min.lng + j as f64 * mesh_type.lng_interval(),
-                    min.lat + i as f64 * mesh_type.lat_interval(),
+                    start_coords.lng + j as f64 * mesh_type.lng_interval(),
+                    start_coords.lat + i as f64 * mesh_type.lat_interval(),
                 );
                 mesh_bins.push(JPMeshCode::from_coordinates(coords, mesh_type));
             }
@@ -222,7 +226,35 @@ impl JPMeshCode {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{assert_approx_eq, assert_mesh_size_correct};
+    const EPSILON: f64 = 1e-6;
+
+    #[macro_export]
+    macro_rules! assert_approx_eq {
+        ($a:expr, $b:expr) => {
+            assert!(
+                ($a - $b).abs() < EPSILON,
+                "assertion failed: `(left ≈ right)`\n  left: `{}`\n right: `{}`\n",
+                $a,
+                $b
+            );
+        };
+    }
+
+    #[macro_export]
+    macro_rules! assert_mesh_size_correct {
+        ($bounds:expr, $lng_interval_seconds:expr, $lat_interval_seconds:expr) => {
+            let min_coord = $bounds.min();
+            let max_coord = $bounds.max();
+            assert_approx_eq!(
+                max_coord.lng - min_coord.lng,
+                $lng_interval_seconds / 3600.0
+            );
+            assert_approx_eq!(
+                max_coord.lat - min_coord.lat,
+                $lat_interval_seconds / 3600.0
+            );
+        };
+    }
 
     // small offset for checking coordinate inside the mesh
     const INNER_OFFSET: f64 = 0.000003;
