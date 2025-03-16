@@ -1,10 +1,6 @@
-pub mod to125m;
-pub mod to50m;
-pub mod tosquared;
+pub mod to_125m;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMeshCalcType {
     To125m,
-    To50m,
-    ToSquared,
 }
