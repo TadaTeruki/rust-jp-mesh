@@ -1,4 +1,4 @@
-use crate::{Coordinates, JPMeshType, Rect, calcs::mesh_to125m::CodeTo125m};
+use crate::{Coordinates, JPMeshType, Rect, calcs::to125m::CodeTo125m};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct JPMeshCode {
