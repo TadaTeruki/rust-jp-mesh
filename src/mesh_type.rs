@@ -1,3 +1,5 @@
+use crate::calcs::JPMeshCalcType;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMeshType {
     /// 第1次地域区画
@@ -66,6 +68,17 @@ impl JPMeshType {
 
     pub const fn lng_interval(&self) -> f64 {
         self.lng_interval_seconds() / 3600.0
+    }
+
+    pub const fn calc_type(&self) -> JPMeshCalcType {
+        match self {
+            JPMeshType::Mesh80km => JPMeshCalcType::To125m,
+            JPMeshType::Mesh10km => JPMeshCalcType::To125m,
+            JPMeshType::Mesh1km => JPMeshCalcType::To125m,
+            JPMeshType::Mesh500m => JPMeshCalcType::To125m,
+            JPMeshType::Mesh250m => JPMeshCalcType::To125m,
+            JPMeshType::Mesh125m => JPMeshCalcType::To125m,
+        }
     }
 }
 

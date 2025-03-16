@@ -3,12 +3,18 @@
 //! - code_number: A number adjusted to D digits with digits defaulting to the binary representation of E (e.g., 67895400000 -> 67895400111 (D=11, E=7), 67895432121 -> 67895432121)
 //! - raw_array: A left-aligned array corresponding to large_number (e.g., [6, 7, 8, 9, 5, 4, 0, 0, 0, 0, 0])
 //! - code_array: A left-aligned array corresponding to code_number
-//! 
-//! - encode: Converts a short_number to a code_number
+//!
+//! - encode: Converts a short_number or large_number to a code_number
 //! - truncate: Truncates a large_number or code_number to a short_number
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CodeNum<const D: usize, const E: u8>(u64);
+
+impl<const D: usize, const E: u8> Default for CodeNum<D, E> {
+    fn default() -> Self {
+        CodeNum(0)
+    }
+}
 
 impl<const D: usize, const E: u8> CodeNum<D, E> {
     /// Creates a new CodeNum instance from an D-digit array.
@@ -75,7 +81,7 @@ fn raw_array_to_code_array<const D: usize, const E: u8>(raw_array: [u8; D]) -> [
     let mut code_array = raw_array;
     let mut e_value = E;
     let mut bit_position = 0;
-    
+
     while e_value > 0 {
         if e_value & 1 == 1 {
             let index = D - 1 - bit_position;
@@ -86,7 +92,7 @@ fn raw_array_to_code_array<const D: usize, const E: u8>(raw_array: [u8; D]) -> [
         e_value >>= 1;
         bit_position += 1;
     }
-    
+
     code_array
 }
 
@@ -108,10 +114,7 @@ fn truncate<const D: usize>(large_number: u64, code_length: usize) -> u64 {
 }
 
 /// 67895432124 -> 67890000101 (code_length = 4), 67895432121 (code_length = 10) (when E=5, D=11)
-fn truncate_and_encode<const D: usize, const E: u8>(
-    large_number: u64,
-    code_length: usize,
-) -> u64 {
+fn truncate_and_encode<const D: usize, const E: u8>(large_number: u64, code_length: usize) -> u64 {
     encode::<D, E>(truncate::<D>(large_number, code_length))
 }
 

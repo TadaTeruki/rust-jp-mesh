@@ -1,3 +1,4 @@
+mod calcs;
 mod code_num;
 mod geom;
 mod mesh_code;
