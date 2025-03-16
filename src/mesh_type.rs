@@ -13,6 +13,8 @@ pub enum JPMeshType {
     Mesh250m,
     /// 8分の1地域メッシュ
     Mesh125m,
+    /// 2倍地域メッシュ
+    Mesh2km,
     /// 5倍地域メッシュ
     Mesh5km,
 }
@@ -26,6 +28,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 9,
             JPMeshType::Mesh250m => 10,
             JPMeshType::Mesh125m => 11,
+            JPMeshType::Mesh2km => 9,
             JPMeshType::Mesh5km => 7,
         }
     }
@@ -38,6 +41,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 15.0,
             JPMeshType::Mesh250m => 7.5,
             JPMeshType::Mesh125m => 3.75,
+            JPMeshType::Mesh2km => 60.0,
             JPMeshType::Mesh5km => 150.0,
         }
     }
@@ -50,6 +54,7 @@ impl JPMeshType {
             JPMeshType::Mesh500m => 22.5,
             JPMeshType::Mesh250m => 11.25,
             JPMeshType::Mesh125m => 5.625,
+            JPMeshType::Mesh2km => 90.0,
             JPMeshType::Mesh5km => 225.0,
         }
     }

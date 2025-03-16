@@ -1,6 +1,6 @@
 use crate::{
     Coordinates, JPMeshType, Rect,
-    calcs::{to_5km::CodeTo5km, to_125m::CodeTo125m},
+    calcs::{to_2km::CodeTo2km, to_5km::CodeTo5km, to_125m::CodeTo125m},
 };
 
 /// 地域メッシュを表現します。
@@ -10,14 +10,18 @@ use crate::{
 /// use rust_jp_mesh::{Coordinates, JPMesh, JPMeshType};
 ///
 /// let coords = Coordinates::new(139.767125, 35.681236);
-/// let mesh = JPMesh::new(coords, JPMeshType::Mesh500m);
-/// assert_eq!(mesh.to_number(), 533946113);
+/// let mesh = JPMesh::new(coords, JPMeshType::Mesh1km);
+/// assert_eq!(mesh.to_number(), 53394611);
 /// assert!(mesh.to_bounds().includes(coords));
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMesh {
     To125m {
         code: CodeTo125m,
+        mesh_type: JPMeshType,
+    },
+    To2km {
+        code: CodeTo2km,
         mesh_type: JPMeshType,
     },
     To5km {
@@ -27,7 +31,7 @@ pub enum JPMesh {
 }
 
 impl JPMesh {
-    /// 指定された緯度経度から地域メッシュを生成します。
+    /// 指定された座標から地域メッシュを生成します。
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
         match mesh_type {
             JPMeshType::Mesh1km
@@ -36,6 +40,10 @@ impl JPMesh {
             | JPMeshType::Mesh125m => {
                 let code = CodeTo125m::from_coordinates(coords, mesh_type);
                 JPMesh::To125m { code, mesh_type }
+            }
+            JPMeshType::Mesh2km => {
+                let code = CodeTo2km::from_coordinates(coords, mesh_type);
+                JPMesh::To2km { code, mesh_type }
             }
             JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
                 let code = CodeTo5km::from_coordinates(coords, mesh_type);
@@ -54,6 +62,10 @@ impl JPMesh {
                 let code = CodeTo125m::from_number(mesh, mesh_type.code_length());
                 JPMesh::To125m { code, mesh_type }
             }
+            JPMeshType::Mesh2km => {
+                let code = CodeTo2km::from_number(mesh, mesh_type.code_length());
+                JPMesh::To2km { code, mesh_type }
+            }
             JPMeshType::Mesh80km | JPMeshType::Mesh10km | JPMeshType::Mesh5km => {
                 let code = CodeTo5km::from_number(mesh, mesh_type.code_length());
                 JPMesh::To5km { code, mesh_type }
@@ -65,6 +77,7 @@ impl JPMesh {
     pub fn to_bounds(&self) -> Rect {
         match self {
             Self::To125m { code, mesh_type } => code.to_bounds(*mesh_type),
+            Self::To2km { code, mesh_type } => code.to_bounds(*mesh_type),
             Self::To5km { code, mesh_type } => code.to_bounds(*mesh_type),
         }
     }
@@ -73,6 +86,7 @@ impl JPMesh {
     pub fn to_number(self) -> u64 {
         match self {
             Self::To125m { code, mesh_type } => code.to_number(mesh_type.code_length()),
+            Self::To2km { code, mesh_type } => code.to_number(mesh_type.code_length()),
             Self::To5km { code, mesh_type } => code.to_number(mesh_type.code_length()),
         }
     }
@@ -81,6 +95,7 @@ impl JPMesh {
     pub fn mesh_type(&self) -> JPMeshType {
         match self {
             Self::To125m { mesh_type, .. } => *mesh_type,
+            Self::To2km { mesh_type, .. } => *mesh_type,
             Self::To5km { mesh_type, .. } => *mesh_type,
         }
     }

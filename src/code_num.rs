@@ -8,6 +8,12 @@
 //! - truncate: Truncates a large_number or code_number to a short_number
 
 /// Represents a mesh code number.
+/// - D: The number of digits in the code.
+/// - E: The default value of the right-aligned digits (represented in binary).
+///
+/// For example:
+/// - CodeNum<11, 0> : CodeNum::from_number(678954, 6) -> CodeNum(67895400000)
+/// - CodeNum<11, 5> : CodeNum::from_number(678954, 6) -> CodeNum(67895400101)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CodeNum<const D: usize, const E: u8>(u64);
 

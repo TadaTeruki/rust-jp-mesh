@@ -1,5 +1,7 @@
 use crate::{Coordinates, JPMeshType, Rect, code_num::CodeNum};
 
+// D=11 は最大桁数
+// E=7 (2進数: 00000000111) となっているのは、下三桁は空間を2x2分割し1-4の値をとる桁であり、使わない場合は0でなく1としなければ座標がずれるため
 pub type CodeTo125m = CodeNum<11, 7>;
 
 impl CodeTo125m {
