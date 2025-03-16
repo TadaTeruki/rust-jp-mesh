@@ -7,7 +7,7 @@ use crate::{
 ///
 /// # サンプル
 /// ```
-/// use rust_japan_mesh::{Coordinates, JPMesh, JPMeshType};
+/// use rust_jp_mesh::{Coordinates, JPMesh, JPMeshType};
 ///
 /// let coords = Coordinates::new(139.767125, 35.681236);
 /// let mesh = JPMesh::new(coords, JPMeshType::Mesh500m);

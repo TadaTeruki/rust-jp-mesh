@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust-japan-mesh"
+name = "rust-jp-mesh"
 version = "0.1.0"
 dependencies = [
  "serde",

@@ -1,4 +1,4 @@
-use rust_japan_mesh::{Coordinates, JPMesh, JPMeshType, Rect};
+use rust_jp_mesh::{Coordinates, JPMesh, JPMeshType, Rect};
 use serde::Serialize;
 use std::fs::File;
 use std::io::Write;
