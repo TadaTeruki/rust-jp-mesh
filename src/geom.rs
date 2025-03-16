@@ -38,4 +38,14 @@ impl Rect {
             (self.min_coord.lat + self.max_coord.lat) / 2.0,
         )
     }
+
+    pub fn includes(&self, coords: Coordinates) -> bool {
+        let min = self.min();
+        let max = self.max();
+
+        coords.lat >= min.lat
+            && coords.lat < max.lat
+            && coords.lng >= min.lng
+            && coords.lng < max.lng
+    }
 }

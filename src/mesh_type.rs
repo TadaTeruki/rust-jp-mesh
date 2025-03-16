@@ -1,3 +1,4 @@
+/// 地域メッシュコードの種類
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMeshType {
     /// 第1次地域区画
@@ -16,20 +17,8 @@ pub enum JPMeshType {
     Mesh5km,
 }
 
-impl Ord for JPMeshType {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.code_length().cmp(&other.code_length()).reverse()
-    }
-}
-
-impl PartialOrd for JPMeshType {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 impl JPMeshType {
-    pub const fn code_length(&self) -> usize {
+    pub(crate) const fn code_length(&self) -> usize {
         match self {
             JPMeshType::Mesh80km => 4,
             JPMeshType::Mesh10km => 6,
@@ -65,32 +54,13 @@ impl JPMeshType {
         }
     }
 
+    /// 緯度方向のメッシュ幅を取得します。(度)
     pub const fn lat_interval(&self) -> f64 {
         self.lat_interval_seconds() / 3600.0
     }
 
+    /// 経度方向のメッシュ幅を取得します。(度)
     pub const fn lng_interval(&self) -> f64 {
         self.lng_interval_seconds() / 3600.0
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_mesh_type_order() {
-        let mesh_types = vec![
-            JPMeshType::Mesh80km,
-            JPMeshType::Mesh10km,
-            JPMeshType::Mesh1km,
-            JPMeshType::Mesh500m,
-            JPMeshType::Mesh250m,
-            JPMeshType::Mesh125m,
-        ];
-
-        for i in 1..mesh_types.len() {
-            assert!(mesh_types[i - 1] > mesh_types[i]);
-        }
     }
 }

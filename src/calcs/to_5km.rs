@@ -56,12 +56,12 @@ impl CodeTo5km {
         // Calculate latitude (southwest corner)
         let lat_base = p * JPMeshType::Mesh80km.lat_interval();
         let lat_q = q * JPMeshType::Mesh10km.lat_interval();
-        let lat_r = ((m - 1.0) / 2.0).floor() * JPMeshType::Mesh500m.lat_interval();
+        let lat_r = ((m - 1.0) / 2.0).floor() * JPMeshType::Mesh5km.lat_interval();
 
         // Calculate longitude (southwest corner)
         let lng_base = 100.0 + u;
         let lng_v = v * JPMeshType::Mesh10km.lng_interval();
-        let lng_w = ((m - 1.0) % 2.0) * JPMeshType::Mesh500m.lng_interval();
+        let lng_w = ((m - 1.0) % 2.0) * JPMeshType::Mesh5km.lng_interval();
 
         // Coordinates of southwest corner
         let min_lat = lat_base + lat_q + lat_r;

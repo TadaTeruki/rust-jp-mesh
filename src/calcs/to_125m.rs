@@ -16,7 +16,7 @@ impl CodeTo125m {
         let p2 = p % 10;
         let u1 = (u / 10) % 10;
         let u2 = u % 10;
-        
+
         // a / lat_interval (Mesh10km) = q % b
         let q = (a / JPMeshType::Mesh10km.lat_interval()).floor() as u8;
         let b = a % JPMeshType::Mesh10km.lat_interval();

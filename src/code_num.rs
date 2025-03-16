@@ -7,6 +7,7 @@
 //! - encode: Converts a short_number or large_number to a code_number
 //! - truncate: Truncates a large_number or code_number to a short_number
 
+/// Represents a mesh code number.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CodeNum<const D: usize, const E: u8>(u64);
 

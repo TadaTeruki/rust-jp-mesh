@@ -3,6 +3,17 @@ use crate::{
     calcs::{to_5km::CodeTo5km, to_125m::CodeTo125m},
 };
 
+/// 地域メッシュを表現します。
+///
+/// # サンプル
+/// ```
+/// use rust_japan_mesh::{Coordinates, JPMeshCode, JPMeshType};
+///
+/// let coords = Coordinates::new(139.767125, 35.681236);
+/// let mesh_code = JPMeshCode::new(coords, JPMeshType::Mesh500m);
+/// assert_eq!(mesh_code.to_number(), 533946113);
+/// assert!(mesh_code.to_bounds().includes(coords));
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JPMeshCode {
     To125m {
@@ -16,6 +27,7 @@ pub enum JPMeshCode {
 }
 
 impl JPMeshCode {
+    /// 指定された緯度経度から地域メッシュを生成します。
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
         match mesh_type {
             JPMeshType::Mesh1km
@@ -32,6 +44,7 @@ impl JPMeshCode {
         }
     }
 
+    /// 指定された地域メッシュコードと種類から地域メッシュを生成します。
     pub fn from_number(mesh_code: u64, mesh_type: JPMeshType) -> Self {
         match mesh_type {
             JPMeshType::Mesh1km
@@ -48,6 +61,7 @@ impl JPMeshCode {
         }
     }
 
+    /// 地域メッシュの範囲を表す矩形を取得します。
     pub fn to_bounds(&self) -> Rect {
         match self {
             Self::To125m { code, mesh_type } => code.to_bounds(*mesh_type),
@@ -55,17 +69,7 @@ impl JPMeshCode {
         }
     }
 
-    pub fn is_inside(&self, coords: Coordinates) -> bool {
-        let bounds = self.to_bounds();
-        let min = bounds.min();
-        let max = bounds.max();
-
-        coords.lat >= min.lat
-            && coords.lat < max.lat
-            && coords.lng >= min.lng
-            && coords.lng < max.lng
-    }
-
+    /// 地域メッシュコードを取得します。
     pub fn to_number(self) -> u64 {
         match self {
             Self::To125m { code, mesh_type } => code.to_number(mesh_type.code_length()),
@@ -73,6 +77,7 @@ impl JPMeshCode {
         }
     }
 
+    /// 地域メッシュの種類を取得します。
     pub fn mesh_type(&self) -> JPMeshType {
         match self {
             Self::To125m { mesh_type, .. } => *mesh_type,
@@ -80,6 +85,7 @@ impl JPMeshCode {
         }
     }
 
+    /// 指定された矩形範囲に含まれる地域メッシュを取得します。
     pub fn from_on_bounds(bounds: Rect, mesh_type: JPMeshType) -> Vec<Self> {
         let mut mesh_bins = vec![];
         let min = bounds.min();
@@ -87,13 +93,13 @@ impl JPMeshCode {
         let lat_len = ((max.lat - min.lat) / mesh_type.lat_interval()).ceil() as u64;
         let lng_len = ((max.lng - min.lng) / mesh_type.lng_interval()).ceil() as u64;
 
-        let start_coords = JPMeshCode::new(min, mesh_type).to_bounds().center();
+        let start = JPMeshCode::new(min, mesh_type).to_bounds().center();
 
         for i in 0..=lat_len {
             for j in 0..=lng_len {
                 let coords = Coordinates::new(
-                    start_coords.lng + j as f64 * mesh_type.lng_interval(),
-                    start_coords.lat + i as f64 * mesh_type.lat_interval(),
+                    start.lng + j as f64 * mesh_type.lng_interval(),
+                    start.lat + i as f64 * mesh_type.lat_interval(),
                 );
                 mesh_bins.push(JPMeshCode::new(coords, mesh_type));
             }
@@ -217,5 +223,15 @@ mod tests {
             let number = mesh_code.to_number();
             assert_eq!(number, test_case.mesh_code_number);
         }
+    }
+
+    #[test]
+    fn test_mesh_code_corner() {
+        let mesh_code = JPMeshCode::new(Coordinates::new(141.15, 39.7), JPMeshType::Mesh1km);
+        let bounds = mesh_code.to_bounds();
+        let min_coord = bounds.min();
+
+        assert_approx_eq!(min_coord.lng, 141.15);
+        assert_approx_eq!(min_coord.lat, 39.7);
     }
 }

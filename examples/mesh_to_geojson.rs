@@ -1,4 +1,4 @@
-use japan_mesh_rs::{Coordinates, JPMeshCode, JPMeshType, Rect};
+use rust_japan_mesh::{Coordinates, JPMeshCode, JPMeshType, Rect};
 use serde::Serialize;
 use std::fs::File;
 use std::io::Write;
@@ -34,8 +34,6 @@ fn rect_to_polygon(rect: Rect) -> Vec<Vec<Vec<f64>>> {
     let min = rect.min();
     let max = rect.max();
 
-    // GeoJSONのポリゴン座標は[経度, 緯度]の順で、反時計回りに定義
-    // 最初と最後の座標は同じである必要がある
     vec![vec![
         vec![min.lng, min.lat],
         vec![max.lng, min.lat],
@@ -46,10 +44,8 @@ fn rect_to_polygon(rect: Rect) -> Vec<Vec<Vec<f64>>> {
 }
 
 fn create_geojson_for_mesh_type(bounds: Rect, mesh_type: JPMeshType) -> GeoJsonFeatureCollection {
-    // 指定された範囲内のメッシュコードを取得
     let mesh_codes = JPMeshCode::from_on_bounds(bounds, mesh_type);
 
-    // 各メッシュコードをGeoJSONのフィーチャーに変換
     let features = mesh_codes
         .into_iter()
         .map(|mesh_code| {
@@ -84,7 +80,6 @@ fn save_geojson(geojson: &GeoJsonFeatureCollection, filename: &str) -> std::io::
 }
 
 fn main() -> std::io::Result<()> {
-    // 各メッシュタイプと範囲の組み合わせを定義
     let mesh_configs = vec![
         (
             "out/mesh80km.geojson",
@@ -98,10 +93,7 @@ fn main() -> std::io::Result<()> {
         ),
         (
             "out/mesh5km.geojson",
-            Rect::new(
-                Coordinates::new(140.5, 41.5),
-                Coordinates::new(141.5, 42.5),
-            ),
+            Rect::new(Coordinates::new(140.5, 41.5), Coordinates::new(141.5, 42.5)),
             JPMeshType::Mesh5km,
         ),
         (
@@ -138,7 +130,6 @@ fn main() -> std::io::Result<()> {
         ),
     ];
 
-    // 各設定に対してGeoJSONを生成して保存
     for (filename, bounds, mesh_type) in mesh_configs {
         println!("{}のGeoJSONを生成中...", filename);
         let geojson = create_geojson_for_mesh_type(bounds, mesh_type);
