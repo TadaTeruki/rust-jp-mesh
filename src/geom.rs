@@ -5,7 +5,7 @@ pub struct Coordinates {
 }
 
 impl Coordinates {
-    pub fn new_(lng: f64, lat: f64) -> Self {
+    pub fn new(lng: f64, lat: f64) -> Self {
         Self { lng, lat }
     }
 }

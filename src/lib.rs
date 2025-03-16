@@ -1,6 +1,5 @@
-mod code2;
+mod code11;
 mod geom;
-mod geom_code;
 mod mesh_code;
 mod mesh_type;
 
@@ -8,7 +7,6 @@ pub use geom::{Coordinates, Rect};
 pub use mesh_code::JPMeshCode;
 pub use mesh_type::JPMeshType;
 
-// テスト用のマクロ定義
 #[cfg(test)]
 const EPSILON: f64 = 1e-6;
 
@@ -38,32 +36,6 @@ macro_rules! assert_mesh_size_correct {
         assert_approx_eq!(
             max_coord.lat - min_coord.lat,
             $lat_interval_seconds / 3600.0
-        );
-    };
-}
-
-#[cfg(test)]
-#[macro_export]
-macro_rules! assert_rect_includes {
-    ($rect:expr, $point:expr) => {
-        assert!(
-            $rect.min().lng <= $point.lng
-                && $rect.min().lat <= $point.lat
-                && $rect.max().lng > $point.lng
-                && $rect.max().lat > $point.lat
-        );
-    };
-}
-
-#[cfg(test)]
-#[macro_export]
-macro_rules! assert_rect_not_includes {
-    ($rect:expr, $point:expr) => {
-        assert!(
-            $rect.min().lng > $point.lng
-                || $rect.min().lat > $point.lat
-                || $rect.max().lng <= $point.lng
-                || $rect.max().lat <= $point.lat
         );
     };
 }
