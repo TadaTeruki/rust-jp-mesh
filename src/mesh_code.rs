@@ -1,7 +1,7 @@
 use crate::{Coordinates, JPMeshType, Rect, code_num::CodeNum};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct JPMeshCode(CodeNum<11, 3>, JPMeshType);
+pub struct JPMeshCode(CodeNum<11, 7>, JPMeshType);
 
 impl JPMeshCode {
     pub fn new(coords: Coordinates, mesh_type: JPMeshType) -> Self {
